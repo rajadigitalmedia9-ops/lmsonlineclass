@@ -13,3 +13,11 @@ Route::prefix('admin')->group(function () {
     Route::get('/dashboard', Dashboard::class)->name('admin.dashboard');
     Route::get('/live-classes', LiveClasses::class)->name('admin.live-classes');
 });
+
+Route::get('/debug-log', function () {
+    $logFile = storage_path('logs/laravel.log');
+    if (file_exists($logFile)) {
+        return response()->file($logFile);
+    }
+    return "No log file found.";
+});
