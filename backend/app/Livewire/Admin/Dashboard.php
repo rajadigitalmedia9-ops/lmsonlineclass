@@ -8,8 +8,10 @@ use App\Models\Course;
 use App\Models\LiveClass;
 use App\Models\Video;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Layout;
 
 #[Title('Admin Dashboard')]
+#[Layout('components.layouts.app')]
 class Dashboard extends Component
 {
     public $studentCount = 0;
