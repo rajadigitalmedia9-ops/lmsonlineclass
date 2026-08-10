@@ -130,10 +130,16 @@ class Students extends Component
         \App\Models\Enrollment::where('user_id', $student->id)->delete();
         
         foreach ($this->selectedCourses as $courseId) {
+            // Find or create a default batch for this course
+            $batch = \App\Models\Batch::firstOrCreate(
+                ['course_id' => $courseId],
+                ['name' => 'Default Batch', 'status' => 'active']
+            );
+
             \App\Models\Enrollment::create([
                 'user_id' => $student->id,
                 'course_id' => $courseId,
-                'batch_id' => \App\Models\Batch::where('course_id', $courseId)->value('id') ?? 1,
+                'batch_id' => $batch->id,
                 'status' => 'active',
                 'start_date' => now(),
             ]);
