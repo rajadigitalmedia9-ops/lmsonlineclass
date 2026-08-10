@@ -16,3 +16,6 @@ php artisan view:cache
 
 # Run database migrations
 php artisan migrate --force
+
+# Seed dummy data
+php artisan db:seed --force
