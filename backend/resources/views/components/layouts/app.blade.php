@@ -23,7 +23,10 @@
                     <a href="/admin/courses" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white {{ request()->routeIs('admin.courses') ? 'bg-gray-800' : '' }}">
                         Courses
                     </a>
-                    <a href="/admin/live-classes" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white {{ request()->routeIs('admin.live-classes') ? 'bg-gray-800' : '' }}">
+                    <a href="/admin/subjects" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white {{ request()->routeIs('admin.subjects') ? 'bg-gray-800' : '' }}">
+                        Subjects
+                    </a>
+                    <a href="/admin/live-classes" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white {{ request()->routeIs('admin.live_classes') ? 'bg-gray-800' : '' }}">
                         Live Classes
                     </a>
                     <a href="/admin/videos" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white {{ request()->routeIs('admin.videos') ? 'bg-gray-800' : '' }}">

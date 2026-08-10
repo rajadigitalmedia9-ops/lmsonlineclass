@@ -14,11 +14,12 @@ Route::get('/', function () {
 
 // Admin Routes
 Route::prefix('admin')->group(function () {
-    Route::get('/dashboard', Dashboard::class)->name('admin.dashboard');
-    Route::get('/live-classes', LiveClasses::class)->name('admin.live-classes');
-    Route::get('/students', Students::class)->name('admin.students');
-    Route::get('/courses', Courses::class)->name('admin.courses');
-    Route::get('/videos', Videos::class)->name('admin.videos');
+    Route::get('/dashboard', \App\Livewire\Admin\Dashboard::class)->name('admin.dashboard');
+    Route::get('/students', \App\Livewire\Admin\Students::class)->name('admin.students');
+    Route::get('/courses', \App\Livewire\Admin\Courses::class)->name('admin.courses');
+    Route::get('/subjects', \App\Livewire\Admin\Subjects::class)->name('admin.subjects');
+    Route::get('/live-classes', \App\Livewire\Admin\LiveClasses::class)->name('admin.live-classes');
+    Route::get('/videos', \App\Livewire\Admin\Videos::class)->name('admin.videos');
 });
 
 // Student Auth
