@@ -14,11 +14,6 @@ use Livewire\Attributes\Layout;
 #[Layout('components.layouts.app')]
 class LiveClasses extends Component
 {
-    public $liveClasses;
-    public $courses;
-    public $batches;
-    public $subjects;
-
     public $showModal = false;
     public $isEdit = false;
     
@@ -33,19 +28,6 @@ class LiveClasses extends Component
     
     // Custom OBS fields
     public $live_room_id; // Acts as stream key
-    
-    public function mount()
-    {
-        $this->loadData();
-        $this->courses = Course::all();
-        $this->batches = Batch::all();
-        $this->subjects = Subject::all();
-    }
-    
-    public function loadData()
-    {
-        $this->liveClasses = LiveClass::with(['course', 'batch', 'subject'])->orderBy('scheduled_at', 'desc')->get();
-    }
     
     public function create()
     {
@@ -106,7 +88,6 @@ class LiveClasses extends Component
         }
         
         $this->showModal = false;
-        $this->loadData();
     }
     
     public function startClass($id)
@@ -116,8 +97,6 @@ class LiveClasses extends Component
         $liveClass->live_room_id = \Illuminate\Support\Str::random(20);
         $liveClass->status = 'active';
         $liveClass->save();
-        
-        $this->loadData();
     }
     
     public function endClass($id)
@@ -125,14 +104,11 @@ class LiveClasses extends Component
         $liveClass = LiveClass::find($id);
         $liveClass->status = 'completed';
         $liveClass->save();
-        
-        $this->loadData();
     }
     
     public function delete($id)
     {
         LiveClass::destroy($id);
-        $this->loadData();
     }
     
     public function resetFields()
@@ -149,6 +125,11 @@ class LiveClasses extends Component
 
     public function render()
     {
-        return view('livewire.admin.live-classes');
+        return view('livewire.admin.live-classes', [
+            'liveClasses' => LiveClass::with(['course', 'batch', 'subject'])->orderBy('scheduled_at', 'desc')->get(),
+            'courses' => Course::all(),
+            'batches' => Batch::all(),
+            'subjects' => Subject::all(),
+        ]);
     }
 }
