@@ -14,6 +14,9 @@ Route::prefix('v1')->group(function () {
         });
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         
+        // Live Classes API
+        Route::get('/live-classes', [\App\Http\Controllers\Api\LiveClassApiController::class, 'getActiveClasses']);
+        
         // Future routes will be added here
         // e.g., /courses, /videos/{id}/play, /device/register
     });
