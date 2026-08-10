@@ -17,17 +17,17 @@
                     <a href="/admin/dashboard" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white {{ request()->routeIs('admin.dashboard') ? 'bg-gray-800' : '' }}">
                         Dashboard
                     </a>
-                    <a href="#" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white">
+                    <a href="/admin/students" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white {{ request()->routeIs('admin.students') ? 'bg-gray-800' : '' }}">
                         Students
                     </a>
-                    <a href="#" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white">
+                    <a href="/admin/courses" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white {{ request()->routeIs('admin.courses') ? 'bg-gray-800' : '' }}">
                         Courses
                     </a>
                     <a href="/admin/live-classes" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white {{ request()->routeIs('admin.live-classes') ? 'bg-gray-800' : '' }}">
                         Live Classes
                     </a>
-                    <a href="#" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white">
-                        Videos
+                    <a href="/admin/videos" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white {{ request()->routeIs('admin.videos') ? 'bg-gray-800' : '' }}">
+                        Offline Videos
                     </a>
                 </nav>
             </aside>
