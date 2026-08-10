@@ -48,8 +48,8 @@
     <!-- Main Content: Player -->
     <div class="flex-1 flex flex-col h-[calc(100vh-100px)]">
         @if($activeLiveClass)
-            <div class="mb-6 border-b border-gray-200 pb-4">
-                <h1 class="text-3xl font-bold text-gray-900">{{ $activeLiveClass->title }}</h1>
+            <div class="mb-6">
+                <h1 class="text-3xl font-extrabold text-[#1e293b]">{{ $activeLiveClass->title }}</h1>
             </div>
             <div class="flex-1 bg-black rounded-2xl overflow-hidden shadow-lg border border-slate-800 relative flex items-center justify-center">
                 <!-- Placeholder for actual RTMP/OBS Player integration -->
@@ -61,15 +61,15 @@
                 
                 <!-- Overlay UI similar to Google Meet screenshot -->
                 <div class="absolute top-4 right-4">
-                    <span class="bg-yellow-500 text-black text-xs font-bold px-3 py-1.5 rounded-full flex items-center shadow-md">
-                        <svg class="w-3 h-3 mr-1 animate-pulse" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"></path></svg>
-                        Watching Live
-                    </span>
+                    <button class="bg-blue-900 bg-opacity-80 hover:bg-opacity-100 text-white text-sm font-semibold px-4 py-2 rounded-lg flex items-center shadow-lg border border-white border-opacity-10 transition">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                        Video Completed
+                    </button>
                 </div>
             </div>
         @elseif($activeVideo)
-            <div class="mb-6 border-b border-gray-200 pb-4">
-                <h1 class="text-3xl font-bold text-gray-900">{{ $activeVideo->title }}</h1>
+            <div class="mb-6">
+                <h1 class="text-3xl font-extrabold text-[#1e293b]">{{ $activeVideo->title }}</h1>
             </div>
             <div class="flex-1 bg-slate-900 rounded-2xl overflow-hidden shadow-lg border border-slate-800 relative">
                 @if($activeVideo->video_path)
@@ -83,6 +83,13 @@
                         <h2 class="text-xl font-medium text-gray-400">Video source not found</h2>
                     </div>
                 @endif
+                
+                <div class="absolute top-4 right-4">
+                    <button class="bg-blue-900 bg-opacity-80 hover:bg-opacity-100 text-white text-sm font-semibold px-4 py-2 rounded-lg flex items-center shadow-lg border border-white border-opacity-10 transition">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                        Video Completed
+                    </button>
+                </div>
             </div>
         @else
             <div class="flex-1 flex flex-col items-center justify-center text-gray-400 bg-white rounded-2xl border border-dashed border-gray-300">

@@ -1,11 +1,16 @@
 <div>
-    <div class="mb-8 border-b border-gray-200 pb-4">
-        <h1 class="text-3xl font-bold text-gray-900 flex items-center">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Live Sessions</h1>
+        <div class="h-1 w-10 bg-blue-600 mt-2 rounded-full mb-8"></div>
+    </div>
+
+    <div class="mb-6">
+        <h2 class="text-xl font-bold text-gray-900 flex items-center">
             <span class="w-8 h-8 rounded-lg bg-red-100 text-red-500 flex items-center justify-center mr-3">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             </span>
             Your Live Rooms
-        </h1>
+        </h2>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -13,7 +18,7 @@
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col hover:shadow-md transition">
                 <!-- Header part -->
                 <div class="bg-blue-500 p-6 text-white relative">
-                    <span class="inline-block bg-blue-400 text-xs font-bold px-2 py-1 rounded-md mb-3">
+                    <span class="inline-block bg-white bg-opacity-20 text-xs font-semibold px-3 py-1 rounded-full mb-3 shadow-sm border border-white border-opacity-10">
                         Active Batch
                     </span>
                     <h2 class="text-xl font-bold leading-snug">{{ strtoupper($class->course->name ?? 'UNKNOWN COURSE') }} ({{ $class->batch->name ?? 'Batch' }})</h2>
