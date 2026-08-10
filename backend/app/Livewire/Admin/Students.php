@@ -92,14 +92,53 @@ class Students extends Component
         $this->password = '';
     }
 
+    // Enrollment Properties
+    public $showEnrollmentModal = false;
+    public $managingStudentId;
+    public $selectedCourses = [];
+    public $allCourses = [];
+
+    public function mount()
+    {
+        $this->allCourses = \App\Models\Course::where('status', 'active')->get();
+    }
+
     public function render()
     {
-        // For now, we return all users since we don't have a role field in the DB yet,
-        // or if we do, we filter. Since we removed 'role', we just show all users except admin.
-        $students = User::where('email', '!=', 'admin@artinlms.com')->orderBy('created_at', 'desc')->get();
-        
+        $students = User::where('email', '!=', 'admin@artinlms.com')
+            ->with('enrollments.course')
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
         return view('livewire.admin.students', [
             'students' => $students
         ]);
+    }
+
+    public function manageEnrollments($id)
+    {
+        $this->managingStudentId = $id;
+        $student = User::with('enrollments')->findOrFail($id);
+        $this->selectedCourses = $student->enrollments->pluck('course_id')->toArray();
+        $this->showEnrollmentModal = true;
+    }
+
+    public function saveEnrollments()
+    {
+        $student = User::findOrFail($this->managingStudentId);
+        
+        \App\Models\Enrollment::where('user_id', $student->id)->delete();
+        
+        foreach ($this->selectedCourses as $courseId) {
+            \App\Models\Enrollment::create([
+                'user_id' => $student->id,
+                'course_id' => $courseId,
+                'batch_id' => \App\Models\Batch::where('course_id', $courseId)->value('id') ?? 1,
+                'status' => 'active',
+                'start_date' => now(),
+            ]);
+        }
+        
+        $this->showEnrollmentModal = false;
     }
 }

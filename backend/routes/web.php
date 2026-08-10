@@ -6,18 +6,36 @@ use App\Livewire\Admin\LiveClasses;
 use App\Livewire\Admin\Students;
 use App\Livewire\Admin\Courses;
 use App\Livewire\Admin\Videos;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Admin Routes (To be protected by auth middleware later)
+// Admin Routes
 Route::prefix('admin')->group(function () {
     Route::get('/dashboard', Dashboard::class)->name('admin.dashboard');
     Route::get('/live-classes', LiveClasses::class)->name('admin.live-classes');
     Route::get('/students', Students::class)->name('admin.students');
     Route::get('/courses', Courses::class)->name('admin.courses');
     Route::get('/videos', Videos::class)->name('admin.videos');
+});
+
+// Student Auth
+Route::get('/login', App\Livewire\Student\Login::class)->name('login');
+Route::post('/logout', function () {
+    Auth::logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect('/login');
+})->name('logout');
+
+// Student Portal Routes
+Route::middleware('auth')->prefix('student')->group(function () {
+    Route::get('/dashboard', App\Livewire\Student\Dashboard::class)->name('student.dashboard');
+    Route::get('/my-courses', App\Livewire\Student\MyCourses::class)->name('student.courses');
+    Route::get('/live-sessions', App\Livewire\Student\LiveSessions::class)->name('student.live');
+    Route::get('/course/{id}', App\Livewire\Student\CoursePlayer::class)->name('student.course.player');
 });
 
 Route::get('/debug-log', function () {
