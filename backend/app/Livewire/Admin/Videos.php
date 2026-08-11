@@ -23,7 +23,9 @@ class Videos extends Component
     public $description;
     public $course_id;
     public $subject_id;
+    public $upload_type = 'file'; // 'file' or 'url'
     public $video_file;
+    public $video_url;
     public $is_free = false;
     
     public function create()
@@ -34,15 +36,26 @@ class Videos extends Component
     
     public function save()
     {
-        $this->validate([
+        $rules = [
             'title' => 'required|string|max:255',
             'course_id' => 'required|exists:courses,id',
             'subject_id' => 'required|exists:subjects,id',
-            'video_file' => 'required|mimes:mp4,webm|max:51200', // max 50MB for Render testing
-        ]);
+            'upload_type' => 'required|in:file,url',
+        ];
+
+        if ($this->upload_type === 'file') {
+            $rules['video_file'] = 'required|mimes:mp4,webm|max:51200';
+        } else {
+            $rules['video_url'] = 'required|url';
+        }
+
+        $this->validate($rules);
         
-        // Store video in private disk
-        $path = $this->video_file->store('videos', 'local');
+        if ($this->upload_type === 'file') {
+            $path = $this->video_file->store('videos', 'local');
+        } else {
+            $path = $this->video_url;
+        }
         
         Video::create([
             'title' => $this->title,
@@ -50,7 +63,7 @@ class Videos extends Component
             'course_id' => $this->course_id,
             'subject_id' => $this->subject_id,
             'video_path' => $path,
-            'duration' => 0, // In reality, we'd extract this with FFMPEG
+            'duration' => 0,
             'is_free' => $this->is_free,
             'status' => 'published',
         ]);
@@ -62,7 +75,9 @@ class Videos extends Component
     {
         $video = Video::find($id);
         if ($video) {
-            \Illuminate\Support\Facades\Storage::disk('local')->delete($video->video_path);
+            if (!str_starts_with($video->video_path, 'http')) {
+                \Illuminate\Support\Facades\Storage::disk('local')->delete($video->video_path);
+            }
             $video->delete();
         }
     }
@@ -73,7 +88,9 @@ class Videos extends Component
         $this->description = '';
         $this->course_id = null;
         $this->subject_id = null;
+        $this->upload_type = 'file';
         $this->video_file = null;
+        $this->video_url = '';
         $this->is_free = false;
     }
 

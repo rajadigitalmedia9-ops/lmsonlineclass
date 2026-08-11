@@ -87,6 +87,33 @@
                                 @error('subject_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>
                             
+                            <!-- Upload Type Selector -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Video Source</label>
+                                <div class="flex items-center space-x-4">
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" wire:model.live="upload_type" value="file" class="form-radio text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2 text-sm text-gray-700">Upload File (Render)</span>
+                                    </label>
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" wire:model.live="upload_type" value="url" class="form-radio text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2 text-sm text-gray-700">External URL (Free/Cloud)</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- External URL Input -->
+                            @if($upload_type === 'url')
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">External Video URL (e.g., Google Drive, S3, Cloudflare R2)</label>
+                                <input type="url" wire:model="video_url" placeholder="https://..." class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
+                                <p class="text-xs text-gray-500 mt-1">Paste the direct link to the MP4 file or embed URL.</p>
+                                @error('video_url') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+                            @endif
+                            
+                            <!-- File Upload Input -->
+                            @if($upload_type === 'file')
                             <div x-on:livewire-upload-start="isUploading = true; uploadError = false"
                                  x-on:livewire-upload-finish="isUploading = false; progress = 100"
                                  x-on:livewire-upload-error="isUploading = false; uploadError = true"
@@ -116,12 +143,13 @@
 
                                 @error('video_file') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>
+                            @endif
                         </div>
                     </div>
                     <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse rounded-b-lg">
                         <button type="submit" 
-                                x-bind:disabled="isUploading || (!@js($video_file) && progress === 0)"
-                                x-bind:class="{ 'opacity-50 cursor-not-allowed': isUploading || (!@js($video_file) && progress === 0) }"
+                                x-bind:disabled="isUploading || (@js($upload_type) === 'file' && !@js($video_file) && progress === 0)"
+                                x-bind:class="{ 'opacity-50 cursor-not-allowed': isUploading || (@js($upload_type) === 'file' && !@js($video_file) && progress === 0) }"
                                 class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
                             <span wire:loading.remove wire:target="save">Upload & Save</span>
                             <span wire:loading wire:target="save">Saving...</span>
