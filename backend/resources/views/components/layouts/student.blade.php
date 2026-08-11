@@ -2,50 +2,110 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{{ $title ?? 'Student Portal' }}</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Artin LMS">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icon-192x192.png">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         body {
             background-color: #f8fafc;
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            /* Prevent pull-to-refresh on mobile */
+            overscroll-behavior-y: none; 
         }
         .sidebar-active {
-            background-color: #eff6ff; /* blue-50 */
-            color: #2563eb; /* blue-600 */
+            background-color: #eff6ff;
+            color: #2563eb;
             font-weight: 500;
         }
         .sidebar-inactive {
-            color: #64748b; /* slate-500 */
+            color: #64748b;
         }
         .sidebar-inactive:hover {
-            background-color: #f1f5f9; /* slate-100 */
-            color: #334155; /* slate-700 */
+            background-color: #f1f5f9;
+            color: #334155;
         }
-        /* Custom scrollbar for a premium feel */
         ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 4px;
+            height: 4px;
         }
         ::-webkit-scrollbar-track {
             background: transparent;
         }
         ::-webkit-scrollbar-thumb {
             background: #cbd5e1;
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+            border-radius: 2px;
         }
     </style>
     @livewireStyles
 </head>
-<body class="antialiased flex h-screen overflow-hidden">
+<body class="antialiased flex h-screen overflow-hidden" x-data="{ sidebarOpen: false }">
     
-    <!-- Sidebar -->
-    <div class="w-64 bg-white border-r border-gray-200 flex flex-col justify-between overflow-y-auto">
+    <!-- Mobile Top Navigation -->
+    <div class="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 z-30 flex items-center justify-between px-4">
+        <div class="font-bold text-xl text-blue-600">Artin LMS</div>
+        <button @click="sidebarOpen = true" class="text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
+    </div>
+
+    <!-- Mobile Sidebar Overlay -->
+    <div x-show="sidebarOpen" class="fixed inset-0 z-40 flex md:hidden" x-ref="dialog" aria-modal="true">
+        <div x-show="sidebarOpen" x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-600 bg-opacity-75" @click="sidebarOpen = false" aria-hidden="true"></div>
+
+        <div x-show="sidebarOpen" x-transition:enter="transition ease-in-out duration-300 transform" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in-out duration-300 transform" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full" class="relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-white">
+            <div class="absolute top-0 right-0 -mr-12 pt-2">
+                <button type="button" @click="sidebarOpen = false" class="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                    <span class="sr-only">Close sidebar</span>
+                    <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Mobile User Profile Snippet -->
+            <div class="px-6 flex items-center space-x-3 pb-4 border-b border-gray-100">
+                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg">
+                    {{ substr(auth()->user()->name ?? 'Student', 0, 1) }}
+                </div>
+                <div class="overflow-hidden">
+                    <p class="text-sm font-semibold text-gray-800 truncate">{{ auth()->user()->name ?? 'Student Name' }}</p>
+                    <p class="text-xs text-gray-500 truncate">{{ auth()->user()->email ?? 'student@example.com' }}</p>
+                </div>
+            </div>
+
+            <div class="mt-5 flex-1 h-0 overflow-y-auto">
+                <nav class="px-2 space-y-1">
+                    @include('components.layouts.partials.student-nav')
+                </nav>
+            </div>
+            <div class="p-4 border-t border-gray-200">
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition sidebar-inactive hover:text-red-600 hover:bg-red-50">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        <span>Logout</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="flex-shrink-0 w-14" aria-hidden="true"></div>
+    </div>
+
+    <!-- Desktop Sidebar -->
+    <div class="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 bg-white border-r border-gray-200 justify-between">
         <div>
-            <!-- User Profile Snippet -->
+            <!-- Desktop User Profile Snippet -->
             <div class="p-6 flex items-center space-x-3 border-b border-gray-100">
                 <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg">
                     {{ substr(auth()->user()->name ?? 'Student', 0, 1) }}
@@ -56,62 +116,9 @@
                 </div>
             </div>
 
-            <!-- Navigation Links -->
-            <nav class="p-4 space-y-1">
-                <a href="{{ route('student.dashboard') }}" class="flex items-center space-x-3 px-4 py-2.5 rounded-lg transition {{ request()->routeIs('student.dashboard') ? 'sidebar-active' : 'sidebar-inactive' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-                    <span>Dashboard</span>
-                </a>
-                
-                <a href="#" class="flex items-center space-x-3 px-4 py-2.5 rounded-lg transition sidebar-inactive">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
-                    <span>Achievements</span>
-                </a>
-
-                <a href="{{ route('student.courses') }}" class="flex justify-between items-center px-4 py-2.5 rounded-lg transition {{ request()->routeIs('student.courses') ? 'sidebar-active' : 'sidebar-inactive' }}">
-                    <div class="flex items-center space-x-3">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                        <span>My Courses</span>
-                    </div>
-                    @if(request()->routeIs('student.courses'))
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    @endif
-                </a>
-
-                <a href="{{ route('student.live') }}" class="flex justify-between items-center px-4 py-2.5 rounded-lg transition {{ request()->routeIs('student.live') ? 'sidebar-active' : 'sidebar-inactive' }}">
-                    <div class="flex items-center space-x-3">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        <span>Live Sessions</span>
-                    </div>
-                    @if(request()->routeIs('student.live'))
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    @endif
-                </a>
-
-                <a href="#" class="flex items-center space-x-3 px-4 py-2.5 rounded-lg transition sidebar-inactive">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                    <span>Bonus Videos</span>
-                </a>
-                
-                <a href="#" class="flex items-center space-x-3 px-4 py-2.5 rounded-lg transition sidebar-inactive">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    <span>Leaderboard</span>
-                </a>
-
-                <a href="#" class="flex items-center space-x-3 px-4 py-2.5 rounded-lg transition sidebar-inactive">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-                    <span>Doubt Chat</span>
-                </a>
-
-                <a href="#" class="flex items-center space-x-3 px-4 py-2.5 rounded-lg transition sidebar-inactive">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                    <span>Doubt Sessions</span>
-                </a>
-                
-                <a href="#" class="flex items-center space-x-3 px-4 py-2.5 rounded-lg transition sidebar-inactive">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                    <span>Profile</span>
-                </a>
+            <!-- Desktop Navigation Links -->
+            <nav class="p-4 space-y-1 overflow-y-auto">
+                @include('components.layouts.partials.student-nav')
             </nav>
         </div>
 
@@ -127,12 +134,27 @@
     </div>
 
     <!-- Main Content -->
-    <div class="flex-1 overflow-y-auto">
-        <div class="p-8 max-w-7xl mx-auto">
-            {{ $slot }}
-        </div>
+    <div class="flex-1 md:pl-64 flex flex-col pt-16 md:pt-0 overflow-hidden">
+        <main class="flex-1 overflow-y-auto focus:outline-none">
+            <div class="p-4 md:p-8 max-w-7xl mx-auto h-full">
+                {{ $slot }}
+            </div>
+        </main>
     </div>
 
+    <!-- PWA Registration Script -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(registration => {
+                    console.log('SW registered: ', registration);
+                }).catch(registrationError => {
+                    console.log('SW registration failed: ', registrationError);
+                });
+            });
+        }
+    </script>
+    
     @livewireScripts
 </body>
 </html>
