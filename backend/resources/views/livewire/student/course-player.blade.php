@@ -73,8 +73,8 @@
             </div>
             <div class="flex-1 bg-slate-900 rounded-2xl overflow-hidden shadow-lg border border-slate-800 relative">
                 @if($activeVideo->video_path)
-                    <video class="w-full h-full object-contain" controls controlsList="nodownload">
-                        <source src="{{ asset('storage/' . $activeVideo->video_path) }}" type="video/mp4">
+                    <video class="w-full h-full object-contain" controls controlsList="nodownload" oncontextmenu="return false;" disablePictureInPicture>
+                        <source src="{{ $activeVideo->stream_url }}" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
                 @else

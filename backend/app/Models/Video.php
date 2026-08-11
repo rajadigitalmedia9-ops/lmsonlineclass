@@ -34,4 +34,23 @@ class Video extends Model
     {
         return $this->hasMany(VideoWatchHistory::class);
     }
+
+    public function getStreamUrlAttribute()
+    {
+        if (empty($this->video_path)) {
+            return null;
+        }
+
+        if (str_starts_with($this->video_path, 'http')) {
+            return $this->video_path;
+        }
+
+        try {
+            // Generate a 3-hour signed URL for Cloudflare R2
+            return \Illuminate\Support\Facades\Storage::disk('r2')
+                ->temporaryUrl($this->video_path, now()->addHours(3));
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
 }

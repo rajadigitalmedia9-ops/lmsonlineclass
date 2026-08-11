@@ -52,7 +52,7 @@ class Videos extends Component
         $this->validate($rules);
         
         if ($this->upload_type === 'file') {
-            $path = $this->video_file->store('videos', 'local');
+            $path = $this->video_file->store('videos', 'r2');
         } else {
             $path = $this->video_url;
         }
@@ -76,7 +76,7 @@ class Videos extends Component
         $video = Video::find($id);
         if ($video) {
             if (!str_starts_with($video->video_path, 'http')) {
-                \Illuminate\Support\Facades\Storage::disk('local')->delete($video->video_path);
+                \Illuminate\Support\Facades\Storage::disk('r2')->delete($video->video_path);
             }
             $video->delete();
         }
