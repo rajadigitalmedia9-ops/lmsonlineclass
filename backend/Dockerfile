@@ -13,6 +13,9 @@ RUN apt-get update && apt-get install -y \
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_pgsql pgsql zip
 
+# Configure PHP upload limits
+RUN echo "upload_max_filesize = 500M\npost_max_size = 500M\nmemory_limit = 512M\nmax_execution_time = 300\nmax_input_time = 300" > /usr/local/etc/php/conf.d/uploads.ini
+
 # Enable Apache mod_rewrite for Laravel routing
 RUN a2enmod rewrite
 
