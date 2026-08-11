@@ -29,7 +29,7 @@ WORKDIR /var/www/html
 COPY . .
 
 # Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader
+RUN composer update --no-dev --optimize-autoloader
 
 # Install Node dependencies and build frontend assets (Tailwind)
 RUN npm install
