@@ -86,10 +86,34 @@
                                 @error('subject_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>
                             
-                            <div>
+                            <div x-data="{ isUploading: false, progress: 0, uploadError: false }"
+                                 x-on:livewire-upload-start="isUploading = true; uploadError = false"
+                                 x-on:livewire-upload-finish="isUploading = false; progress = 100"
+                                 x-on:livewire-upload-error="isUploading = false; uploadError = true"
+                                 x-on:livewire-upload-progress="progress = $event.detail.progress">
+                                
                                 <label class="block text-sm font-medium text-gray-700">Video File (MP4, max 50MB for testing)</label>
                                 <input type="file" wire:model="video_file" class="mt-1 block w-full sm:text-sm">
-                                <div wire:loading wire:target="video_file" class="text-blue-500 text-xs mt-1">Uploading...</div>
+                                
+                                <!-- Progress Bar -->
+                                <div x-show="isUploading" class="mt-3">
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" x-bind:style="`width: ${progress}%`"></div>
+                                    </div>
+                                    <p class="text-blue-600 text-xs mt-1 font-semibold" x-text="`Uploading... ${progress}%`"></p>
+                                </div>
+                                
+                                <!-- Success Message -->
+                                <div x-show="!isUploading && progress === 100" class="mt-2 text-green-600 text-xs font-semibold flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    File uploaded to temporary storage! Click 'Upload & Save' to finalize.
+                                </div>
+
+                                <!-- Error Message -->
+                                <div x-show="uploadError" class="mt-2 text-red-600 text-xs font-semibold">
+                                    Upload failed. Please check the file size limits or network connection.
+                                </div>
+
                                 @error('video_file') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>
                         </div>
