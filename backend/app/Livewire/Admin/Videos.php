@@ -23,10 +23,23 @@ class Videos extends Component
     public $description;
     public $course_id;
     public $subject_id;
-    public $upload_type = 'file'; // 'file' or 'url'
     public $video_file;
     public $video_url;
+    public $upload_type = 'file'; // 'file', 'url', or 'manual_r2'
+    public $manual_r2_path;
     public $is_free = false;
+
+    protected function rules()
+    {
+        return [
+            'title' => 'required|string|max:255',
+            'course_id' => 'required|exists:courses,id',
+            'subject_id' => 'nullable|exists:subjects,id',
+            'video_file' => 'required_if:upload_type,file|nullable|file|mimes:mp4,mov,avi|max:512000', // 500MB max
+            'video_url' => 'required_if:upload_type,url|nullable|url',
+            'manual_r2_path' => 'required_if:upload_type,manual_r2|nullable|string',
+        ];
+    }
     
     public function create()
     {
@@ -36,33 +49,27 @@ class Videos extends Component
     
     public function save()
     {
-        $rules = [
-            'title' => 'required|string|max:255',
-            'course_id' => 'required|exists:courses,id',
-            'subject_id' => 'required|exists:subjects,id',
-            'upload_type' => 'required|in:file,url',
-        ];
+        $this->validate();
 
-        if ($this->upload_type === 'file') {
-            $rules['video_file'] = 'required|mimes:mp4,webm|max:51200';
-        } else {
-            $rules['video_url'] = 'required|url';
-        }
+        $path = null;
+        $url = null;
 
-        $this->validate($rules);
-        
-        if ($this->upload_type === 'file') {
+        if ($this->upload_type === 'file' && $this->video_file) {
+            // Upload directly to Cloudflare R2 disk
             $path = $this->video_file->store('videos', 'r2');
-        } else {
-            $path = $this->video_url;
+        } elseif ($this->upload_type === 'url') {
+            $url = $this->video_url;
+        } elseif ($this->upload_type === 'manual_r2') {
+            $path = $this->manual_r2_path;
         }
-        
+
         Video::create([
             'title' => $this->title,
             'description' => $this->description,
             'course_id' => $this->course_id,
             'subject_id' => $this->subject_id,
             'video_path' => $path,
+            'video_url' => $url,
             'duration' => 0,
             'is_free' => $this->is_free,
             'status' => 'published',

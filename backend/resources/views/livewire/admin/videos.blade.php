@@ -90,10 +90,14 @@
                             <!-- Upload Type Selector -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Video Source</label>
-                                <div class="flex items-center space-x-4">
+                                <div class="flex flex-col space-y-2">
                                     <label class="inline-flex items-center">
                                         <input type="radio" wire:model.live="upload_type" value="file" class="form-radio text-blue-600 focus:ring-blue-500">
-                                        <span class="ml-2 text-sm text-gray-700">Upload to Cloudflare R2</span>
+                                        <span class="ml-2 text-sm text-gray-700">Upload to Cloudflare R2 (Max 50MB)</span>
+                                    </label>
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" wire:model.live="upload_type" value="manual_r2" class="form-radio text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2 text-sm text-gray-700">I already uploaded the file to Cloudflare R2</span>
                                     </label>
                                     <label class="inline-flex items-center">
                                         <input type="radio" wire:model.live="upload_type" value="url" class="form-radio text-blue-600 focus:ring-blue-500">
@@ -102,10 +106,20 @@
                                 </div>
                             </div>
 
+                            <!-- Manual R2 URL Input -->
+                            @if($upload_type === 'manual_r2')
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Filename in Cloudflare R2</label>
+                                <input type="text" wire:model="manual_r2_path" placeholder="e.g. videos/my-large-video.mp4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
+                                <p class="text-xs text-gray-500 mt-1">Upload the large file directly via your Cloudflare Dashboard, then paste the filename here. The system will automatically secure it and generate Signed URLs.</p>
+                                @error('manual_r2_path') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+                            @endif
+
                             <!-- External URL Input -->
                             @if($upload_type === 'url')
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">External Video URL (e.g., Google Drive, S3, Cloudflare R2)</label>
+                                <label class="block text-sm font-medium text-gray-700">External Video URL</label>
                                 <input type="url" wire:model="video_url" placeholder="https://..." class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
                                 <p class="text-xs text-gray-500 mt-1">Paste the direct link to the MP4 file or embed URL.</p>
                                 @error('video_url') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
