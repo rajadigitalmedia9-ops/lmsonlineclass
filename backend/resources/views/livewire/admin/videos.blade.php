@@ -93,11 +93,11 @@
                                 <div class="flex items-center space-x-4">
                                     <label class="inline-flex items-center">
                                         <input type="radio" wire:model.live="upload_type" value="file" class="form-radio text-blue-600 focus:ring-blue-500">
-                                        <span class="ml-2 text-sm text-gray-700">Upload File (Render)</span>
+                                        <span class="ml-2 text-sm text-gray-700">Upload to Cloudflare R2</span>
                                     </label>
                                     <label class="inline-flex items-center">
                                         <input type="radio" wire:model.live="upload_type" value="url" class="form-radio text-blue-600 focus:ring-blue-500">
-                                        <span class="ml-2 text-sm text-gray-700">External URL (Free/Cloud)</span>
+                                        <span class="ml-2 text-sm text-gray-700">External URL (YouTube/Drive)</span>
                                     </label>
                                 </div>
                             </div>
