@@ -37,6 +37,10 @@ class Video extends Model
 
     public function getStreamUrlAttribute()
     {
+        if (!empty($this->hls_path) && $this->conversion_status === 'completed') {
+            return \Illuminate\Support\Facades\Storage::disk('r2')->temporaryUrl($this->hls_path, now()->addHours(3));
+        }
+
         if (empty($this->video_path)) {
             return null;
         }
@@ -46,7 +50,6 @@ class Video extends Model
         }
 
         try {
-            // Generate a 3-hour signed URL for Cloudflare R2
             return \Illuminate\Support\Facades\Storage::disk('r2')
                 ->temporaryUrl($this->video_path, now()->addHours(3));
         } catch (\Exception $e) {

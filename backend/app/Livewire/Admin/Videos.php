@@ -63,7 +63,7 @@ class Videos extends Component
             $path = $this->manual_r2_path;
         }
 
-        Video::create([
+        $video = Video::create([
             'title' => $this->title,
             'description' => $this->description,
             'course_id' => $this->course_id,
@@ -73,7 +73,12 @@ class Videos extends Component
             'duration' => 0,
             'is_free' => $this->is_free,
             'status' => 'published',
+            'conversion_status' => $path ? 'pending' : 'completed',
         ]);
+        
+        if ($path) {
+            \App\Jobs\ProcessVideoHLS::dispatch($video);
+        }
         
         $this->showModal = false;
     }

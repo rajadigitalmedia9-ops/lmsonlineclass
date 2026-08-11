@@ -8,7 +8,8 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     nodejs \
-    npm
+    npm \
+    ffmpeg
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_pgsql pgsql zip

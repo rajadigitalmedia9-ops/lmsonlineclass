@@ -18,11 +18,29 @@
                 <h1 class="text-2xl md:text-3xl font-extrabold text-[#1e293b]">{{ $activeVideo->title }}</h1>
             </div>
             <div class="flex-1 bg-slate-900 rounded-2xl overflow-hidden shadow-lg border border-slate-800 relative min-h-[250px]">
-                @if($activeVideo->video_path)
-                    <video class="w-full h-full object-contain" controls controlsList="nodownload" oncontextmenu="return false;" disablePictureInPicture>
-                        <source src="{{ $activeVideo->stream_url }}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
+                @if($activeVideo->video_path || $activeVideo->hls_path)
+                    @assets
+                    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+                    <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+                    @endassets
+
+                    <div class="w-full h-full" wire:key="video-{{ $activeVideo->id }}" 
+                         x-data="{ player: null }" 
+                         x-init="
+                            player = videojs($refs.videoEl, { fluid: true, controlBar: { pictureInPictureToggle: false } });
+                            $cleanup(() => { if (player) { player.dispose(); } });
+                         ">
+                        <video
+                            x-ref="videoEl"
+                            class="video-js vjs-default-skin w-full h-full object-contain"
+                            controls
+                            preload="auto"
+                            oncontextmenu="return false;"
+                        >
+                            <source src="{{ $activeVideo->stream_url }}" type="{{ str_contains($activeVideo->stream_url, '.m3u8') ? 'application/x-mpegURL' : 'video/mp4' }}">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
                 @else
                     <div class="w-full h-full flex flex-col items-center justify-center text-white p-4">
                         <svg class="w-12 h-12 md:w-16 md:h-16 text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
