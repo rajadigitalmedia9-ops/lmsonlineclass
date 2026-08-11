@@ -52,7 +52,8 @@
     <div class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-800 bg-opacity-75">
         <div class="relative p-4 w-full max-w-lg max-h-full">
             <div class="relative bg-white rounded-lg shadow">
-                <form wire:submit.prevent="save">
+                <form wire:submit.prevent="save" 
+                      x-data="{ isUploading: false, progress: 0, uploadError: false, get isProcessing() { return this.isUploading && this.progress === 100; } }">
                     <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                         <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4" id="modal-title">
                             Upload Video
@@ -86,8 +87,7 @@
                                 @error('subject_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>
                             
-                            <div x-data="{ isUploading: false, progress: 0, uploadError: false }"
-                                 x-on:livewire-upload-start="isUploading = true; uploadError = false"
+                            <div x-on:livewire-upload-start="isUploading = true; uploadError = false"
                                  x-on:livewire-upload-finish="isUploading = false; progress = 100"
                                  x-on:livewire-upload-error="isUploading = false; uploadError = true"
                                  x-on:livewire-upload-progress="progress = $event.detail.progress">
@@ -100,11 +100,11 @@
                                     <div class="w-full bg-gray-200 rounded-full h-2">
                                         <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" x-bind:style="`width: ${progress}%`"></div>
                                     </div>
-                                    <p class="text-blue-600 text-xs mt-1 font-semibold" x-text="`Uploading... ${progress}%`"></p>
+                                    <p class="text-blue-600 text-xs mt-1 font-semibold" x-text="isProcessing ? 'Processing on server, please wait...' : `Uploading... ${progress}%`"></p>
                                 </div>
                                 
                                 <!-- Success Message -->
-                                <div x-show="!isUploading && progress === 100" class="mt-2 text-green-600 text-xs font-semibold flex items-center">
+                                <div x-show="!isUploading && progress === 100 && !uploadError" class="mt-2 text-green-600 text-xs font-semibold flex items-center">
                                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                     File uploaded to temporary storage! Click 'Upload & Save' to finalize.
                                 </div>
@@ -119,7 +119,10 @@
                         </div>
                     </div>
                     <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse rounded-b-lg">
-                        <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm" wire:loading.attr="disabled">
+                        <button type="submit" 
+                                x-bind:disabled="isUploading || (!@js($video_file) && progress === 0)"
+                                x-bind:class="{ 'opacity-50 cursor-not-allowed': isUploading || (!@js($video_file) && progress === 0) }"
+                                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
                             <span wire:loading.remove wire:target="save">Upload & Save</span>
                             <span wire:loading wire:target="save">Saving...</span>
                         </button>
