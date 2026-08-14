@@ -44,14 +44,8 @@ ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Configure Apache to listen on Render's dynamic port (default 10000)
-RUN sed -i 's/Listen 80/Listen ${PORT}/g' /etc/apache2/ports.conf
-RUN sed -i 's/:80/:${PORT}/g' /etc/apache2/sites-available/000-default.conf
+# Configure Apache to listen on port 80
+RUN sed -i 's/Listen ${PORT}/Listen 80/g' /etc/apache2/ports.conf || true
 
-# Give a default port just in case
-ENV PORT=10000
-
-# Run migrations, start the background queue worker, and start Apache
-CMD php artisan migrate --force && \
-    php artisan queue:work --timeout=3600 & \
-    apache2-foreground
+# Run migrations and start Apache
+CMD php artisan migrate --force && apache2-foreground

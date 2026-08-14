@@ -12,6 +12,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/live-stream-test', function () {
+    return view('live-stream-test');
+});
+
 // Admin Routes
 Route::prefix('admin')->group(function () {
     Route::get('/dashboard', \App\Livewire\Admin\Dashboard::class)->name('admin.dashboard');

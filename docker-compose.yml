@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: artin_app
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+      # Reverb port
+      - "8080:8080"
+    environment:
+      - DB_HOST=postgres
+      - REDIS_HOST=redis
+      - AWS_ENDPOINT=http://minio:9000
+    depends_on:
+      - postgres
+      - redis
+      - minio
+
+  postgres:
+    image: postgres:16
+    container_name: artin_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: artin
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: artin_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  minio:
+    image: minio/minio
+    container_name: artin_minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: password123
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+
+  mediamtx:
+    image: bluenviron/mediamtx:latest
+    container_name: artin_mediamtx
+    restart: unless-stopped
+    ports:
+      - "1935:1935" # RTMP
+      - "8554:8554" # RTSP
+      - "8888:8888" # HLS
+      - "8889:8889" # WebRTC (HTTP)
+      - "8189:8189/udp" # WebRTC (UDP)
+    # Removing volume mount for mediamtx.yml until we create it to avoid directory creation errors
+    # volumes:
+    #   - ./mediamtx.yml:/mediamtx.yml
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
